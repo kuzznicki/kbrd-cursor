@@ -5,7 +5,7 @@
     "description": "Move the cursor with the keyboard",
     "content_scripts": [
         {
-            "js": ["scripts/script.js"],
+            "js": ["scripts/cursor.js"],
             "matches": ["<all_urls>"]
         }
     ]
