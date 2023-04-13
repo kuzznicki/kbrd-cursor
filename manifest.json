@@ -1,0 +1,12 @@
+{
+    "manifest_version": 3,
+    "name": "Keyboard Cursor",
+    "version": "1.0",
+    "description": "Move the cursor with the keyboard",
+    "content_scripts": [
+        {
+            "js": ["scripts/script.js"],
+            "matches": ["<all_urls>"]
+        }
+    ]
+}
