@@ -6,6 +6,12 @@ const FAST_CURSOR_COLOR = 'rgba(255, 255, 255, 0.5)';
 const CURSOR_BORDER_COLOR = 'rgba(0, 0, 0, 1)';
 const CURSOR_BORDER_WIDTH = 1;
 
+const CLICK_KEY = 'Enter';
+const RESET_SPEED_KEY = 'ShiftLeft';
+const SCROLL_UP_KEY = 'KeyW';
+const SCROLL_DOWN_KEY = 'KeyS';
+const TOGGLE_CURSOR_KEY = 'KeyM';
+
 type Direction = 'up' | 'down' | 'left' | 'right';
 const KEY_TO_DIRECTION: Record<string, Direction> = {
     ArrowUp: 'up',
@@ -14,67 +20,39 @@ const KEY_TO_DIRECTION: Record<string, Direction> = {
     ArrowRight: 'right',
 };
 let executed = false;
+let cursorVisible = false;
 let cursorSpeed = 0;
 let lastMoveTime = 0;
-let speedResetTimeout: NodeJS.Timeout | null = null;
+let speedResetTimeout: number | null = null;
 let lastDirectionX: Direction | null = null;
 let lastDirectionY: Direction | null = null;
 let mouseCursor: HTMLDivElement | null = null;
 let cursorX = 100;
 let cursorY = 100;
 
-export function mouse() {
+mouse();
+
+function mouse() {
+    console.log('start...')
     if (typeof document === 'undefined' || executed) return;
 
     document.body.appendChild(createMouseCursor());
     
     document.addEventListener('keydown', (e) => {
-        const direction = KEY_TO_DIRECTION[e.key];
-        const clicked = e.key === 'Enter';
+        if (e.code === TOGGLE_CURSOR_KEY && e.altKey) return toggleCursorVisibility(e);
+        if (!cursorVisible) return;
 
-        if (!direction && !clicked) return;
-
-        if (clicked) {
-            if (!mouseCursor) return;
-            const { top, left } = mouseCursor.getBoundingClientRect();
-
-            const element = document.elementFromPoint(left, top) as HTMLElement;
-            if (!element) return;
-
-            element.click();
-            setCursorSize('big');
-
-            setTimeout(() => {
-                setCursorSize('normal')
-            }, 100);
-        }
-
-        if (speedResetTimeout) clearTimeout(speedResetTimeout);
-
-        const isDirectionX = direction === 'left' || direction === 'right';
-
-        const delta = Date.now() - lastMoveTime;
-        const switchedDirection = isDirectionX 
-            ? direction !== lastDirectionX
-            : direction !== lastDirectionY;
-
-        if (e.shiftKey) {
+        if (e.code === RESET_SPEED_KEY) {
+            e.preventDefault();
+            e.stopPropagation();
             setCursorSpeed(0);
-        } else if (delta < FAST_MOVE_TIME) {
-            if (switchedDirection) {
-                setCursorSpeed(Math.max(cursorSpeed - 2, 0));
-            } else {
-                setCursorSpeed(Math.min(cursorSpeed + 1, CURSOR_STEPS.length - 1));
-            }
-
-            speedResetTimeout = setTimeout(() => setCursorSpeed(0), FAST_MOVE_TIME);
         }
+        if (e.code === CLICK_KEY) return handleClick(e);
+        if (e.code === SCROLL_UP_KEY) return handleScroll(e, 'up');
+        if (e.code === SCROLL_DOWN_KEY) return handleScroll(e, 'down');
         
-        moveCursor(direction);
-
-        lastDirectionX = isDirectionX ? direction : lastDirectionX;
-        lastDirectionY = !isDirectionX ? direction : lastDirectionY;
-        lastMoveTime = Date.now();
+        const direction = KEY_TO_DIRECTION[e.key];
+        if (direction) return handleMove(e, direction);
     });
 
     executed = true;
@@ -90,7 +68,7 @@ function createMouseCursor() {
     mouseCursor.style.width = '12px';
     mouseCursor.style.height = '12px';
 
-    mouseCursor.style.background = 'rgba(255, 255, 0, 0.5)';
+    mouseCursor.style.background = SLOW_CURSOR_COLOR;
     mouseCursor.style.zIndex = '9000';
     
     mouseCursor.style.borderRadius = '50%';
@@ -98,7 +76,70 @@ function createMouseCursor() {
 
     mouseCursor.style.transform = 'translate(-50%, -50%)';
 
+    mouseCursor.style.display = 'none';
+
     return mouseCursor;
+}
+
+function toggleCursorVisibility(evt: KeyboardEvent) {
+    evt.preventDefault();
+    evt.stopPropagation();
+
+    cursorVisible = !cursorVisible;
+    if (mouseCursor) {
+        mouseCursor.style.display = cursorVisible ? 'block' : 'none';
+    }
+}
+
+function handleClick(evt: KeyboardEvent) {
+    if (!mouseCursor) return;
+    
+    evt.preventDefault();
+    evt.stopPropagation();
+    
+    const { top, left } = mouseCursor.getBoundingClientRect();
+
+    const element = document.elementFromPoint(left, top) as HTMLElement;
+    element?.click();
+
+    setCursorSize('big');
+    setTimeout(() => setCursorSize('normal'), 100);
+}
+
+function handleMove(evt: KeyboardEvent, direction: Direction) {
+    if (speedResetTimeout) clearTimeout(speedResetTimeout);
+    evt.preventDefault();
+    evt.stopPropagation();
+
+    const delta = Date.now() - lastMoveTime;
+    const isDirectionX = direction === 'left' || direction === 'right';
+    const switchedDirection = isDirectionX 
+        ? direction !== lastDirectionX
+        : direction !== lastDirectionY;
+
+    if (delta < FAST_MOVE_TIME) {
+        const newSpeed = switchedDirection
+            ? Math.max(cursorSpeed - 2, 0)
+            : Math.min(cursorSpeed + 1, CURSOR_STEPS.length - 1);
+
+        setCursorSpeed(newSpeed);
+        speedResetTimeout = setTimeout(() => setCursorSpeed(0), FAST_MOVE_TIME);
+    }
+
+    moveCursor(direction);
+
+    lastDirectionX = isDirectionX ? direction : lastDirectionX;
+    lastDirectionY = !isDirectionX ? direction : lastDirectionY;
+    lastMoveTime = Date.now();
+}
+
+function handleScroll(evt: KeyboardEvent, direction: 'up' | 'down') {
+    evt.preventDefault();
+    evt.stopPropagation();
+
+    window.scrollBy({
+        top: direction === 'up' ? -200 : 200,
+    });
 }
 
 function setCursorSpeed(speed: number) {
