@@ -7,7 +7,7 @@ const CURSOR_BORDER_COLOR = 'rgba(0, 0, 0, 1)';
 const CURSOR_BORDER_WIDTH = 2;
 
 const CLICK_KEY = 'Enter';
-const RESET_SPEED_KEY = 'ShiftLeft';
+// const RESET_SPEED_KEY = 'ShiftLeft';
 const SCROLL_UP_KEY = 'ArrowUp';
 const SCROLL_DOWN_KEY = 'ArrowDown';
 const TOGGLE_CURSOR_KEY = 'KeyM';
@@ -45,7 +45,8 @@ function mouse() {
         if (e.code === TOGGLE_CURSOR_KEY && e.altKey) return toggleCursorVisibility(e);
         if (!cursorVisible) return;
 
-        if (e.code === RESET_SPEED_KEY) {
+        // if (e.code === RESET_SPEED_KEY) {
+        if (e.shiftKey) {
             e.preventDefault();
             e.stopPropagation();
             setCursorSpeed(0);
