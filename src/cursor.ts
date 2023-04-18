@@ -8,8 +8,8 @@ const CURSOR_BORDER_WIDTH = 1;
 
 const CLICK_KEY = 'Enter';
 const RESET_SPEED_KEY = 'ShiftLeft';
-const SCROLL_UP_KEY = 'KeyW';
-const SCROLL_DOWN_KEY = 'KeyS';
+const SCROLL_UP_KEY = 'ArrowUp';
+const SCROLL_DOWN_KEY = 'ArrowDown';
 const TOGGLE_CURSOR_KEY = 'KeyM';
 
 type Direction = 'up' | 'down' | 'left' | 'right';
@@ -47,9 +47,9 @@ function mouse() {
             e.stopPropagation();
             setCursorSpeed(0);
         }
-        if (e.code === CLICK_KEY) return handleClick(e);
-        if (e.code === SCROLL_UP_KEY) return handleScroll(e, 'up');
-        if (e.code === SCROLL_DOWN_KEY) return handleScroll(e, 'down');
+        if (e.code === CLICK_KEY && e.altKey) return handleClick(e);
+        if (e.code === SCROLL_UP_KEY && e.altKey) return handleScroll(e, 'up');
+        if (e.code === SCROLL_DOWN_KEY && e.altKey) return handleScroll(e, 'down');
         
         const direction = KEY_TO_DIRECTION[e.key];
         if (direction) return handleMove(e, direction);
