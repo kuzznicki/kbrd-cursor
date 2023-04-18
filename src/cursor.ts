@@ -4,13 +4,16 @@ const FAST_MOVE_TIME = 300;
 const SLOW_CURSOR_COLOR = 'rgba(255, 255, 0, 0.5)';
 const FAST_CURSOR_COLOR = 'rgba(255, 255, 255, 0.5)';
 const CURSOR_BORDER_COLOR = 'rgba(0, 0, 0, 1)';
-const CURSOR_BORDER_WIDTH = 1;
+const CURSOR_BORDER_WIDTH = 2;
 
 const CLICK_KEY = 'Enter';
 const RESET_SPEED_KEY = 'ShiftLeft';
 const SCROLL_UP_KEY = 'ArrowUp';
 const SCROLL_DOWN_KEY = 'ArrowDown';
 const TOGGLE_CURSOR_KEY = 'KeyM';
+
+const SMALL_CURSOR_SIZE = '16px';
+const BIG_CURSOR_SIZE = '24px';
 
 type Direction = 'up' | 'down' | 'left' | 'right';
 const KEY_TO_DIRECTION: Record<string, Direction> = {
@@ -68,8 +71,8 @@ function createMouseCursor() {
     mouseCursor.style.top = `${cursorY}px`;
     mouseCursor.style.left = `${cursorX}px`;
 
-    mouseCursor.style.width = '12px';
-    mouseCursor.style.height = '12px';
+    mouseCursor.style.width = SMALL_CURSOR_SIZE;
+    mouseCursor.style.height = SMALL_CURSOR_SIZE;
 
     mouseCursor.style.background = SLOW_CURSOR_COLOR;
     mouseCursor.style.zIndex = '9000';
@@ -187,7 +190,7 @@ function setCursorColor(color: string) {
 
 function setCursorSize(size: 'normal' | 'big') {
     if (mouseCursor) {
-        mouseCursor.style.width = `${size === 'big' ? 20 : 12}px`;
-        mouseCursor.style.height = `${size === 'big' ? 20 : 12}px`;
+        mouseCursor.style.width = size === 'big' ? BIG_CURSOR_SIZE : SMALL_CURSOR_SIZE;
+        mouseCursor.style.height = size === 'big' ? BIG_CURSOR_SIZE : SMALL_CURSOR_SIZE;
     }
 }
