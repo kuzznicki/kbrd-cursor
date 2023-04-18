@@ -61,7 +61,7 @@ function mouse() {
 function createMouseCursor() {
     mouseCursor = document.createElement('div');
     mouseCursor.classList.add('mouse-cursor');
-    mouseCursor.style.position = 'absolute';
+    mouseCursor.style.position = 'fixed';
     mouseCursor.style.top = `${cursorY}px`;
     mouseCursor.style.left = `${cursorX}px`;
 
