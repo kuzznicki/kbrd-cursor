@@ -27,8 +27,8 @@ let speedResetTimeout: number | null = null;
 let lastDirectionX: Direction | null = null;
 let lastDirectionY: Direction | null = null;
 let mouseCursor: HTMLDivElement | null = null;
-let cursorX = 100;
-let cursorY = 100;
+let cursorX = 0;
+let cursorY = 0;
 
 mouse();
 
@@ -59,6 +59,9 @@ function mouse() {
 }
 
 function createMouseCursor() {
+    cursorX = Math.floor(window.innerWidth / 2);
+    cursorY = Math.floor(window.innerHeight / 2);
+
     mouseCursor = document.createElement('div');
     mouseCursor.classList.add('mouse-cursor');
     mouseCursor.style.position = 'fixed';
